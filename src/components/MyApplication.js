@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState, useEffect } from 'react';
 import { createApolloClient } from '../apollo/apolloClient';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { ApolloProvider } from '@apollo/client';
 import { Provider } from 'react-redux';
@@ -18,7 +19,14 @@ export const MyApplication = ({ accessToken, userToken, emailUser, uniqueId, req
   const [isChangeTheme, setIsChangeTheme] = useState(false);
   const [theme, setTheme] = useState(createTheme(defaultTheme));
 
-  const client = useRef(createApolloClient(setDialogError, setErrorMessage, setIsLoading, setAccessToken, setEmailUser, setUniqueId));
+  const httpLink = createHttpLink({
+    uri: 'http://localhost:4000/api', // URL de votre serveur Express avec Apollo Server
+  });
+  
+  const client = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+  });
 
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
@@ -50,7 +58,7 @@ export const MyApplication = ({ accessToken, userToken, emailUser, uniqueId, req
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         {/*ajout des fonctions d'apollo dans le dom */}
-        <ApolloProvider client={client.current}>
+        <ApolloProvider client={client}>
           {/*ajout du theme css dans le dom*/}
           <ThemeProvider theme={theme}>
             <SnackBarCustom></SnackBarCustom>

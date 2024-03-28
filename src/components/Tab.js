@@ -362,7 +362,6 @@ const Tab = (props) => {
           // dispatch(
           //   updateSaisie({
           //     id: props.id,
-
           //     typeProjet: typeProjet,
           //     projet: projet,
           //     client: client,
