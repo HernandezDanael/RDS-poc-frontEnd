@@ -1,175 +1,180 @@
 import {
-  Button,
   useTheme,
   Accordion,
   AccordionDetails,
-  Typography,
   AccordionSummary,
+  InputLabel,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  InputLabel,
-} from '@mui/material';
-import React, { useCallback, useMemo, useState } from 'react';
-import Tab from './Tab';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+} from "@mui/material";
+import React, { useCallback, useMemo, useState } from "react";
+import Tab from "./Tab";
+import { AgGridReact } from "ag-grid-react";
+import { DeleteLigne } from "../assets/func/Picto";
 
 const Saisie = ({
-  idAnnee,
-  idSemaine,
-  saisieType,
-  handleClick,
-  openDialogDelete,
-  tabContent,
-  openSupSaisie,
-  total,
-  closeDialogDelete,
-  suppSaisieAll,
-  suppSaisieAllSemaine,
-  openDialogDeleteSemaine,
-  closeDialogDeleteSemaine,
-  openSupSaisieSemaine,
+  year,
+  mois,
+  jour,
+  heure,
+  salle,
+  getAnnee,
+  getAllMois,
+  getJour,
+  getAllSalle,
+  getAllHeure,
+  handleChangeMois,
+  handleChangeJour,
+  handleChangeSalle,
+  handleChangeHeure,
+  handleAddSaisie,
+  onBlureSaisieSalle,
+  dataRow,
+  disableSaisie,
+  handleChangeRow,
+  openDialogDelet,
+  onClickSupp,
+  handleChangeDialogDel,
+  handleCloseDel,
 }) => {
   const theme = useTheme();
-  const [error, setError] = useState(false);
-
-  const onErrorSaisie = useCallback(
-    (currentSaisie) => {
-      let totalTemp = total();
-      if (saisieType == 'semaine') {
-        tabContent.forEach((element) => {
-          if (element.id == currentSaisie.id && element.id_saisie != undefined) {
-            totalTemp = totalTemp - element.total;
-          }
-        });
-        if (totalTemp > 45 || totalTemp + parseFloat(currentSaisie.value) > 45) {
-          setError(true);
-          return true;
-        } else {
-          setError(false);
-          return false;
-        }
-      } else {
-        let lundi = currentSaisie.lundi != undefined ? (currentSaisie.lundi != '' ? parseFloat(currentSaisie.lundi) : 0) : 0;
-        let mardi = currentSaisie.mardi != undefined ? (currentSaisie.mardi != '' ? parseFloat(currentSaisie.mardi) : 0) : 0;
-        let mercredi = currentSaisie.mercredi != undefined ? (currentSaisie.mercredi != '' ? parseFloat(currentSaisie.mercredi) : 0) : 0;
-        let jeudi = currentSaisie.jeudi != undefined ? (currentSaisie.jeudi != '' ? parseFloat(currentSaisie.jeudi) : 0) : 0;
-        let vendredi = currentSaisie.vendredi != undefined ? (currentSaisie.vendredi != '' ? parseFloat(currentSaisie.vendredi) : 0) : 0;
-        tabContent.forEach((element) => {
-          if (element.id == currentSaisie.id && element.id_saisie != undefined) {
-            totalTemp = totalTemp - element.total;
-          }
-        });
-        if (totalTemp > 45 || totalTemp + lundi + mardi + mercredi + jeudi + vendredi > 45) {
-          setError(true);
-          return true;
-        } else {
-          setError(false);
-          return false;
-        }
-      }
-    },
-    [saisieType, tabContent, total]
-  );
-
   const headerAccordion = useMemo(() => {
-    if (saisieType == 'semaine') {
-      return (
-        <>
-          <AccordionSummary style={theme.pageTest.accordeonCursor}>
-            <div style={theme.pageTest.standardContainerHeaderAccord}>
-              <div style={theme.pageTest.standardFlexContainer}>Saisie Semaine</div>
-              <div>Total : {total()}H</div>
-            </div>
-          </AccordionSummary>
-          <div style={theme.pageTest.standardLabelContainer}>
-            <InputLabel sx={{ width: '100%' }}>
-              <div style={theme.pageTest.standardHeadLabelContainer}>
-                <div style={theme.pageTest.accordContainerSemaine}>Type de projet</div>
-                <div style={theme.pageTest.accordContainerSemaine}>Projet</div>
-                <div style={theme.pageTest.accordContainerSemaine}>Client</div>
-                <div style={theme.pageTest.accordContainerSemaine}>Tâche</div>
-                <div style={theme.pageTest.accordSemaineContainer}>Total Heure</div>
-              </div>
-            </InputLabel>
-            <Button sx={{ ...theme.pageTest.trashBoutonHeader }} onClick={openDialogDeleteSemaine()}>
-              <DeleteForeverIcon />
-            </Button>
+    return (
+      <>
+        <AccordionSummary style={theme.pageTest.accordeonCursor}>
+          <div style={theme.pageTest.standardContainerHeaderAccord}>
+            <div style={theme.pageTest.standardFlexContainer}>Reservation</div>
           </div>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <AccordionSummary style={theme.pageTest.accordeonCursor}>
-            <div style={theme.pageTest.standardContainerHeaderAccord}>
-              <div style={theme.pageTest.standardFlexContainer}>Saisie Jour</div>
-              <div>Total : {total()}H</div>
+        </AccordionSummary>
+        <div style={theme.pageTest.standardLabelContainer}>
+          <InputLabel sx={{ width: "100%" }}>
+            <div style={theme.pageTest.standardHeadLabelContainer}>
+              <div style={theme.pageTest.accordContainer}>Annee</div>
+              <div style={theme.pageTest.accordContainer}>Mois</div>
+              <div style={theme.pageTest.accordContainer}>Jour</div>
+              <div style={theme.pageTest.accordContainer}>Salle</div>
+              <div style={theme.pageTest.accordContainer}>Heures</div>
             </div>
-          </AccordionSummary>
-          <div style={theme.pageTest.standardLabelContainer}>
-            <InputLabel sx={{ width: '100%' }}>
-              <div style={theme.pageTest.standardHeadLabelContainer}>
-                <div style={theme.pageTest.accordContainer}>Type de projet</div>
-                <div style={theme.pageTest.accordContainer}>Projet</div>
-                <div style={theme.pageTest.accordContainer}>Client</div>
-                <div style={theme.pageTest.accordContainer}>Tâche</div>
-                <div style={theme.pageTest.accordDayContainer}>Lundi</div>
-                <div style={theme.pageTest.accordDayContainer}>Mardi </div>
-                <div style={theme.pageTest.accordDayContainer}>Mercredi </div>
-                <div style={theme.pageTest.accordDayContainer}>Jeudi</div>
-                <div style={theme.pageTest.accordDayContainer}>Vendredi</div>
-              </div>
-            </InputLabel>
-            <Button sx={{ ...theme.pageTest.trashBoutonHeader }} onClick={openDialogDelete()}>
-              <DeleteForeverIcon />
-            </Button>
-          </div>
-        </>
-      );
-    }
+          </InputLabel>
+        </div>
+      </>
+    );
   }, [
-    openDialogDelete,
-    openDialogDeleteSemaine,
-    saisieType,
     theme.pageTest.accordContainer,
-    theme.pageTest.accordContainerSemaine,
-    theme.pageTest.accordDayContainer,
-    theme.pageTest.accordSemaineContainer,
     theme.pageTest.accordeonCursor,
     theme.pageTest.standardContainerHeaderAccord,
     theme.pageTest.standardFlexContainer,
     theme.pageTest.standardHeadLabelContainer,
     theme.pageTest.standardLabelContainer,
-    theme.pageTest.trashBoutonHeader,
-    total,
   ]);
+  //AG Grid
+  const [gridOptions, setGridOption] = useState();
+  const containerStyle = useMemo(
+    () => ({ width: "100%", height: "100vh" }),
+    []
+  );
+  const column = useMemo(() => {
+    let tab = [
+      {
+        field: "annee",
+        headerName: "Annee",
+        flex: 1,
+        editable: false,
+        sortable: true,
+        cellClass: "grid-cell-centered",
+      },
+      {
+        field: "mois",
+        headerName: "Mois",
+        flex: 1,
+        editable: false,
+        sortable: true,
+        cellClass: "grid-cell-centered",
+      },
+      {
+        field: "jour",
+        headerName: "Jour",
+        flex: 1,
+        editable: false,
+        sortable: true,
+        cellClass: "grid-cell-centered",
+      },
+      {
+        field: "salle",
+        headerName: "Salle",
+        flex: 1,
+        editable: false,
+        sortable: true,
+        cellClass: "grid-cell-centered",
+      },
+      {
+        field: "heures",
+        headerName: "heures",
+        flex: 1,
+        editable: false,
+        sortable: true,
+        cellClass: "grid-cell-centered",
+      },
+      {
+        field: "statut",
+        headerName: "Statut",
+        flex: 1,
+        editable: false,
+        sortable: true,
+        cellClass: "grid-cell-centered",
+      },
+      {
+        field: "del",
+        headerName: "",
+        flex: 0.5,
+        editable: false,
+        sortable: false,
+        cellStyle: {
+          ...theme.agGridCustom.gridCellCentered,
+          padding: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          PointerEvents: "auto",
+          cursor: "pointer",
+        },
+        onCellClicked: (event) => {
+          if (event.column.colId === "del" && event.data.statut == "en cours") {
+            handleChangeDialogDel();
+          }
+        },
+        cellRenderer: (event) => {
+          if (event.data.statut == "en cours") {
+            return DeleteLigne(event, theme);
+          }
+        },
+      },
+    ];
+    return tab;
+  }, [handleChangeDialogDel, theme]);
+  const defaultColDef = useMemo(
+    () => ({
+      width: 100,
+      editable: true,
+      filter: "agTextColumnFilter",
+      wrapHeaderText: true,
+      autoHeaderHeight: true,
+      suppressMovable: true,
+      filtersParams: {
+        suppressAndOrCondition: true,
+      },
+    }),
+    []
+  );
+  const onGridReady = useCallback(
+    (e) => {
+      setGridOption(e.api);
+    },
+    [setGridOption]
+  );
 
-  const dataTab = useMemo(() => {
-    
-      return tabContent.map((element) => (
-        <Tab
-          key={element.id}
-          id={element.id}
-          id_annee={idAnnee}
-          id_semaine={idSemaine}
-          id_saisie={element.id_saisie}
-          typeProjet={element.typeProjet}
-          projet={element.projet}
-          client={element.client}
-          tache={element.tache}
-          lundi={element.lundi}
-          mardi={element.mardi}
-          mercredi={element.mercredi}
-          jeudi={element.jeudi}
-          vendredi={element.vendredi}
-          total={element.total}
-          onErrorSaisie={(currentSaisie) => onErrorSaisie(currentSaisie)}
-          error={error}></Tab>
-      ));
-    
-  }, [error, idAnnee, idSemaine, onErrorSaisie, saisieType, tabContent]);
   return (
     <div style={theme.pageTest.bodyContainer}>
       <div style={theme.pageTest.container1}>
@@ -180,42 +185,96 @@ const Saisie = ({
                 <Accordion style={theme.pageTest.accordeon} expanded={true}>
                   {headerAccordion}
                   <AccordionDetails sx={theme.pageTest.colorstandardContainer}>
-                    {dataTab}
-                    <Typography>
-                      <div style={theme.pageTest.standardContainer}>
-                        <div style={theme.pageTest.standardFlexContainer}>
-                          <Button sx={theme.pageTest.standarddHomeBouton} onClick={handleClick()}>
-                            Ajouter une saisie
-                          </Button>
-                        </div>
-                      </div>
-                    </Typography>
+                    <Tab
+                      year={year}
+                      mois={mois}
+                      jour={jour}
+                      heure={heure}
+                      salle={salle}
+                      getAnnee={getAnnee}
+                      getAllMois={getAllMois}
+                      getJour={getJour}
+                      getAllSalle={getAllSalle}
+                      getAllHeure={getAllHeure}
+                      handleChangeMois={handleChangeMois}
+                      handleChangeJour={handleChangeJour}
+                      handleChangeSalle={handleChangeSalle}
+                      handleChangeHeure={handleChangeHeure}
+                      onBlureSaisieSalle={onBlureSaisieSalle}
+                    ></Tab>
                   </AccordionDetails>
                 </Accordion>
-                <Dialog
-                  open={openSupSaisieSemaine}
-                  onClose={closeDialogDeleteSemaine}
-                  aria-labelledby="alert-dialog-deleteSaisie"
-                  aria-describedby="alert-dialog-deleteSaisie">
-                  <DialogTitle id="dialog-deleteAllsaisie">Suppression des saisies</DialogTitle>
-                  <DialogContent>Êtes vous sûr de vouloir supprimer toutes les saisies ?</DialogContent>
-                  <DialogActions>
-                    <Button onClick={suppSaisieAllSemaine()}>Confirmer</Button>
-                    <Button onClick={closeDialogDeleteSemaine()}>Annuler</Button>
-                  </DialogActions>
-                </Dialog>
-
-                <Dialog
-                  open={openSupSaisie}
-                  onClose={closeDialogDelete}
-                  aria-labelledby="alert-dialog-deleteSaisie"
-                  aria-describedby="alert-dialog-deleteSaisie">
-                  <DialogTitle id="dialog-deleteAllsaisie">Suppression des saisies</DialogTitle>
-                  <DialogContent>Êtes vous sûr de vouloir supprimer toutes les saisies ?</DialogContent>
-                  <DialogActions>
-                    <Button onClick={suppSaisieAll()}>Confirmer</Button>
-                    <Button onClick={closeDialogDelete()}>Annuler</Button>
-                  </DialogActions>
+                <div style={theme.pageTest.standardConfirmBouton}>
+                  <Button
+                    onClick={handleAddSaisie}
+                    style={
+                      disableSaisie() == true
+                        ? { ...theme.pageTest.standardDisableHomeBouton }
+                        : { ...theme.pageTest.standardHomeBouton }
+                    }
+                    disabled={disableSaisie()}
+                  >
+                    confirmer
+                  </Button>
+                </div>
+                <div
+                  style={{
+                    height: "40vh",
+                    marginTop: "64px",
+                  }}
+                >
+                  <div
+                    style={{
+                      ...theme.agGridCustom.gridStyles,
+                    }}
+                    className={
+                      theme.palette.mode == "light"
+                        ? "ag-theme-alpine"
+                        : "ag-theme-alpine-dark"
+                    }
+                  >
+                    <AgGridReact
+                      rowData={dataRow}
+                      columnDefs={column}
+                      defaultColDef={defaultColDef}
+                      onGridReady={onGridReady}
+                      gridOptions={{ rowClass: "pointerCursor" }}
+                      onCellClicked={handleChangeRow}
+                      rowHeight={32}
+                      rowSelection={"single"}
+                    ></AgGridReact>
+                  </div>
+                </div>
+                <Dialog open={openDialogDelet} onClose={handleCloseDel}>
+                  <DialogTitle>Annulé Réservation</DialogTitle>
+                  <DialogContent>
+                    <p>Êtes-vous sûr de vouloir annuler cette réservation ?</p>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "end",
+                        marginTop: "32px",
+                      }}
+                    >
+                      <Button
+                        onClick={onClickSupp}
+                        style={{
+                          marginRight: "8px",
+                          ...theme.pageTest.standardHomeBouton,
+                        }}
+                      >
+                        Confirmer
+                      </Button>
+                      <Button
+                        onClick={handleCloseDel}
+                        style={{
+                          ...theme.pageTest.standardHomeBouton,
+                        }}
+                      >
+                        Annulé
+                      </Button>
+                    </div>
+                  </DialogContent>
                 </Dialog>
               </div>
             </div>

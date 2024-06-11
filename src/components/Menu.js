@@ -1,6 +1,6 @@
-import { Button, useTheme } from '@mui/material';
-import React, { useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Button, useTheme } from "@mui/material";
+import React, { useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   ManageAccounts,
   QueryBuilder,
@@ -10,21 +10,38 @@ import {
   Badge,
   DataThresholding,
   AssignmentTurnedIn,
-} from '@mui/icons-material/';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+} from "@mui/icons-material/";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { useSelector } from "react-redux";
 const Menu = () => {
   const theme = useTheme();
   const location = useLocation();
 
   const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.user.value);
 
- 
+  const lesReservation = useCallback(() => {
+    navigate("/");
+  }, [navigate]);
+
+  const lesUtilisateur = useCallback(() => {
+    navigate("/utilisateur");
+  }, [navigate]);
+
+  const lesSalle = useCallback(() => {
+    navigate("/salle");
+  }, [navigate]);
+
+  const lesSaisieData = useCallback(() => {
+    navigate("/saisieData");
+  }, [navigate]);
+
   return (
-    <div style={{ ...theme.menu.containerMenu, paddingTop: '12px' }}>
+    <div style={{ ...theme.menu.containerMenu, paddingTop: "12px" }}>
       <Button
-        onClick={""}
+        onClick={lesReservation}
         sx={
-          location.pathname === '/'
+          location.pathname === "/"
             ? {
                 ...theme.menu.buttonMenu,
                 ...theme.menu.buttonMenuSelect,
@@ -32,80 +49,59 @@ const Menu = () => {
             : theme.menu.buttonMenu
         }
         variant="contained"
-        startIcon={<CalendarMonthIcon></CalendarMonthIcon>}>
+        startIcon={<CalendarMonthIcon></CalendarMonthIcon>}
+      >
         <div style={theme.button.textButton}>Les Reservations</div>
       </Button>
-      <Button
-        onClick={""}
-        sx={
-          location.pathname === ''
-            ? {
-                ...theme.menu.buttonMenu,
-                ...theme.menu.buttonMenuSelect,
-              }
-            : theme.menu.buttonMenu
-        }
-        variant="contained"
-        startIcon={<ManageAccounts></ManageAccounts>}>
-        <div style={theme.button.textButton}>Les Employes</div>
-      </Button>
-      <Button
-        onClick={""}
-        sx={
-          location.pathname === ''
-            ? {
-                ...theme.menu.buttonMenu,
-                ...theme.menu.buttonMenuSelect,
-              }
-            : theme.menu.buttonMenu
-        }
-        variant="contained"
-        startIcon={<SettingsAccessibility></SettingsAccessibility>}>
-        <div style={theme.button.textButton}>Les Client</div>
-      </Button>
-      <Button
-        onClick={""}
-        sx={
-          location.pathname === ''
-            ? {
-                ...theme.menu.buttonMenu,
-                ...theme.menu.buttonMenuSelect,
-              }
-            : theme.menu.buttonMenu
-        }
-        variant="contained"
-        startIcon={<Badge></Badge>}>
-        <div style={theme.button.textButton}>les facture</div>
-      </Button>
-      <Button
-        onClick={""}
-        sx={
-          location.pathname === ''
-            ? {
-                ...theme.menu.buttonMenu,
-                ...theme.menu.buttonMenuSelect,
-              }
-            : theme.menu.buttonMenu
-        }
-        variant="contained"
-        startIcon={<Category></Category>}>
-        <div style={theme.button.textButton}>Les Salles</div>
-      </Button>
-      <Button
-        onClick={""}
-        sx={
-          location.pathname === ''
-            ? {
-                ...theme.menu.buttonMenu,
-                ...theme.menu.buttonMenuSelect,
-              }
-            : theme.menu.buttonMenu
-        }
-        variant="contained"
-        startIcon={<QueryBuilder></QueryBuilder>}>
-        <div style={theme.button.textButton}>Historique Des Reservations</div>
-      </Button>
- 
+      {currentUser.droit === "admin" && (
+        <div>
+          <Button
+            onClick={lesUtilisateur}
+            sx={
+              location.pathname === "/utilisateur"
+                ? {
+                    ...theme.menu.buttonMenu,
+                    ...theme.menu.buttonMenuSelect,
+                  }
+                : theme.menu.buttonMenu
+            }
+            variant="contained"
+            startIcon={<ManageAccounts></ManageAccounts>}
+          >
+            <div style={theme.button.textButton}>Les Utilisateurs</div>
+          </Button>
+          <Button
+            onClick={lesSalle}
+            sx={
+              location.pathname === "/salle"
+                ? {
+                    ...theme.menu.buttonMenu,
+                    ...theme.menu.buttonMenuSelect,
+                  }
+                : theme.menu.buttonMenu
+            }
+            variant="contained"
+            startIcon={<Category></Category>}
+          >
+            <div style={theme.button.textButton}>Les Salles</div>
+          </Button>
+          <Button
+            onClick={lesSaisieData}
+            sx={
+              location.pathname === "/saisieData"
+                ? {
+                    ...theme.menu.buttonMenu,
+                    ...theme.menu.buttonMenuSelect,
+                  }
+                : theme.menu.buttonMenu
+            }
+            variant="contained"
+            startIcon={<Category></Category>}
+          >
+            <div style={theme.button.textButton}>Saisie Data</div>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

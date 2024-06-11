@@ -1,6 +1,6 @@
-import { Alert, Snackbar } from '@mui/material';
-import React, { useImperativeHandle, forwardRef, useCallback } from 'react';
-import { useReducer } from 'react';
+import { Alert, Snackbar } from "@mui/material";
+import React, { useImperativeHandle, forwardRef, useCallback } from "react";
+import { useReducer } from "react";
 
 // Composant custom pour affichage des snackBar dans l'application
 
@@ -19,18 +19,21 @@ props : {
 */
 
 const reducer = (state, action) => {
-  if (action.type === 'open') {
+  if (action.type === "open") {
     return {
-      text: action.payload.text ? action.payload.text : '',
+      text: action.payload.text ? action.payload.text : "",
       open: true,
       snackbar: action.payload.snackbar ? action.payload.snackbar : {},
+      severity: action.payload.severity ? action.payload.severity : "",
       style: action.payload.style ? action.payload.style : {},
       picto: action.payload.picto ? action.payload.picto : null,
-      position: action.payload.position ? action.payload.position : { vertical: 'bottom', horizontal: 'left' },
+      position: action.payload.position
+        ? action.payload.position
+        : { vertical: "bottom", horizontal: "left" },
       duration: action.payload.duration ? action.payload.duration : 6000,
     };
   }
-  if (action.type === 'close') {
+  if (action.type === "close") {
     return {
       ...state,
       open: false,
@@ -41,33 +44,55 @@ const reducer = (state, action) => {
 // eslint-disable-next-line react/display-name
 const SnackBarCustomUI = forwardRef((props, ref) => {
   const [config, dispatch] = useReducer(reducer, {
-    text: '',
+    text: "",
     open: false,
+    severity: "",
     style: {},
     picto: null,
-    position: { vertical: 'bottom', horizontal: 'left' },
-    duration: 6000,
+    position: { vertical: "bottom", horizontal: "left" },
+    duration: "",
   });
 
-  const open = useCallback(({ text, snackbar, style, picto, position, duration }) => {
-    dispatch({ type: 'open', payload: { text, snackbar, style, picto, position, duration } });
-  }, []);
+  const open = useCallback(
+    ({ text, snackbar, severity, style, picto, position, duration }) => {
+      dispatch({
+        type: "open",
+        payload: { text, snackbar, severity, style, picto, position, duration },
+      });
+    },
+    []
+  );
   const close = useCallback(() => {
-    dispatch({ type: 'close' });
+    dispatch({ type: "close" });
   }, []);
 
   useImperativeHandle(ref, () => ({ open }), [open]);
   return (
     <Snackbar
-      anchorOrigin={{ vertical: config.position.vertical, horizontal: config.position.horizontal }}
+      anchorOrigin={{
+        vertical: config.position.vertical,
+        horizontal: config.position.horizontal,
+      }}
       open={config.open}
       autoHideDuration={config.duration}
       style={{ ...config.style }}
       sx={{ ...config.snackbar }}
-      onClose={() => {
-        close();
-      }}>
-      <Alert icon={config.picto ? config.picto : <></>}>{config.text}</Alert>
+      onClose={
+        config.severity === "error"
+          ? () => {}
+          : () => {
+              close();
+            }
+      }
+    >
+      <Alert
+        sx={{ width: "95vw" }}
+        severity={config.severity}
+        variant="filled"
+        icon={config.picto ? config.picto : <></>}
+      >
+        {config.text}
+      </Alert>
     </Snackbar>
   );
 });
